@@ -1,0 +1,157 @@
+{% load static %}  <!-- Añade esto al inicio del archivo -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rendición #{{ rendicion.id }} - {{ rendicion.chofer }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1.5cm;
+            @top-center {
+                content: "Comprobante de Rendición";
+                font-family: Arial;
+                font-size: 14pt;
+                color: #555;
+            }
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #4a90e2;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 24pt;
+        }
+        .header .subtitle {
+            color: #7f8c8d;
+            font-size: 12pt;
+        }
+        .info-box {
+            background: #f9f9f9;
+            border: 1px solid #e1e1e1;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .info-item {
+            flex: 1;
+            min-width: 200px;
+            margin: 5px 0;
+        }
+        .info-item strong {
+            color: #4a90e2;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+        th {
+            background: #4a90e2;
+            color: white;
+            text-align: left;
+            padding: 10px;
+            font-weight: bold;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .totals {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .totals p {
+            margin: 5px 0;
+            font-size: 14pt;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 10pt;
+            color: #7f8c8d;
+            border-top: 1px solid #e1e1e1;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+		<!-- Usa la URL directa con estilo de respaldo -->
+    <img src="{{ logo_url }}" 
+         alt="Logo CorpUX" 
+         style="height: 80px;
+                -weasyprint-force-vector: true;
+                border: 1px solid #ccc; /* Solo para debug */">
+                
+        <h1>Rendición #{{ rendicion.id }}</h1>
+        <p class="subtitle">Comprobante oficial - {{ rendicion.fecha_creacion }}</p>
+    </div>
+
+    <div class="info-box">
+        <div class="info-item">
+            <strong>Chofer:</strong> {{ rendicion.chofer }}<br>
+            <strong>Email:</strong> {{ rendicion.chofer.email }}
+        </div>
+        <div class="info-item">
+            <strong>Vehículo:</strong> {{ rendicion.vehiculo }}<br>
+            <strong>Patente:</strong> {{ rendicion.vehiculo.patente }}
+        </div>
+        <div class="info-item">
+            <strong>Fecha Cierre:</strong> {{ rendicion.fecha_cierre|default:"-" }}<br>
+            <strong>Estado:</strong> Cerrada
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Tipo de Servicio</th>
+                <th>Ingresos ($)</th>
+                <th>Egresos ($)</th>
+                <th>Beneficiario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for viaje in viajes %}
+            <tr>
+                <td>{{ viaje.get_tipo_servicio_display }}</td>
+                <td>${{ viaje.ingresos|floatformat:2 }}</td>
+                <td>${{ viaje.egresos|floatformat:2 }}</td>
+                <td>{{ viaje.beneficiario_real|default:"-" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <p><strong>Total Ingresos:</strong> ${{ total_ingresos|floatformat:2 }}</p>
+        <p><strong>Total Egresos:</strong> ${{ total_egresos|floatformat:2 }}</p>
+        <p><strong>Total Neto:</strong> ${{ total_neto|floatformat:2 }}</p>
+    </div>
+
+    <div class="footer">
+        <p>Sistema de Rendiciones © {% now "Y" %} - Generado el {% now "d/m/Y H:i" %}</p>
+    </div>
+</body>
+</html>
